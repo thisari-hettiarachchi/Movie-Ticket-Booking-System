@@ -3,6 +3,7 @@ import "./globals.css";
 
 import NavBar from "@/components/shared/NavBar";
 import Footer from "@/components/shared/Footer";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,22 +16,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Seatify: Your Digital Gateway to the Big Screen",
+  title: "Seatify | Your Digital Gateway to the Big Screen",
   description:
     "Seatify is a modern movie ticket booking platform that lets you browse movies, select seats, and reserve tickets seamlessly—all in one place.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">      
-      <body        
-        className={`${geistSans.variable}
-        ${geistMono.variable} antialiased`}
-      >        
-        <NavBar/>        
-        {children}        
-        <Footer/>      
-      </body>   
-    </html>  
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <NavBar/>
+          {children}
+          <Footer/>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
