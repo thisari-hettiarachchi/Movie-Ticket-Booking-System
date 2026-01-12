@@ -1,10 +1,8 @@
-import React from 'react'
+import MyBookingsSection from "@/components/sections/MyBookingsSections/BookingsSection";
 
-const MyBookings = () => {
-  return (
-    <div>
-      
-    </div>
-  )
+
+export default function MyBookingsPage() {
+  return <MyBookingsSection />
 }
+
 
