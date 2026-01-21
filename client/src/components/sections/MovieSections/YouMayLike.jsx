@@ -3,10 +3,13 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import MovieCard from "@/components/MovieCard";
 import { useAppContext } from "@/context/AppContext";
+import { dummyShowsData } from "@/data";
 
 const YouMayLike = () => {
   const router = useRouter();
-  const { shows } = useAppContext();
+  // const { shows } = useAppContext();
+
+  const shows = dummyShowsData; // Using dummy data for now
 
   return (
     <div className="px-6 md:px-16 lg:px-40 pt-5 md:pt-10">
