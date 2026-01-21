@@ -19,6 +19,7 @@ import {
 
 import Loading from "@/app/loading";
 import { useAppContext } from "@/context/AppContext";
+import { dummyShowsData } from "@/data";
 
 const HeroSection = () => {
   const router = useRouter();
@@ -27,21 +28,21 @@ const HeroSection = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [previewStartIndex, setPreviewStartIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { nowPlayingMovies, image_base_url, setHeroMovies } = useAppContext();
+  const { image_base_url, setHeroMovies } = useAppContext();
 
   const PREVIEWS_PER_VIEW = 5;
 
-  // Shuffle movies and set them in context
+  // Use dummy data shuffled
   useEffect(() => {
-    if (nowPlayingMovies.length > 0) {
-      const shuffled = [...nowPlayingMovies]
+    if (dummyShowsData.length > 0) {
+      const shuffled = [...dummyShowsData]
         .sort(() => Math.random() - 0.5)
-        .slice(0, PREVIEWS_PER_VIEW);
+        .slice(0, Math.min(PREVIEWS_PER_VIEW, dummyShowsData.length));
       setShuffledMovies(shuffled);
       setHeroMovies(shuffled); // Share with context
       setLoading(false);
     }
-  }, [nowPlayingMovies, setHeroMovies]);
+  }, [setHeroMovies]);
 
   // Auto-next movie
   useEffect(() => {
@@ -71,8 +72,8 @@ const HeroSection = () => {
         setPreviewStartIndex(
           Math.min(
             shuffledMovies.length - PREVIEWS_PER_VIEW,
-            currentMovieIndex - 2
-          )
+            currentMovieIndex - 2,
+          ),
         );
       }
     }
@@ -98,7 +99,7 @@ const HeroSection = () => {
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentMovieIndex(
-        (prev) => (prev - 1 + shuffledMovies.length) % shuffledMovies.length
+        (prev) => (prev - 1 + shuffledMovies.length) % shuffledMovies.length,
       );
       setIsTransitioning(false);
     }, 100);
@@ -128,7 +129,7 @@ const HeroSection = () => {
   const currentMovie = shuffledMovies[currentMovieIndex];
   const visiblePreviews = shuffledMovies.slice(
     previewStartIndex,
-    previewStartIndex + PREVIEWS_PER_VIEW
+    previewStartIndex + PREVIEWS_PER_VIEW,
   );
 
   return (

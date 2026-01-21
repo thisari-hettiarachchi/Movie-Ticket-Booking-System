@@ -9,6 +9,7 @@ import { ClockIcon, ArrowRightIcon, Loader2 } from "lucide-react";
 import isoTimeFormat from "@/lib/isoTimeFormat";
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
+import { dummyShowsData, dummyDateTimeData, dummyDashboardData } from "@/data";
 
 export default function SeatLayoutPage() {
   const groupRows = [
@@ -29,15 +30,25 @@ export default function SeatLayoutPage() {
   const { axios, getToken, user } = useAppContext();
   const currency = process.env.NEXT_PUBLIC_CURRENCY || "LKR ";
 
-  const getShow = async () => {
-    try {
-      const { data } = await axios.get(`/api/show/${id}`);
-      if (data.success) {
-        setShow(data);
-      }
-    } catch (error) {
-      console.log(error);
+  const getShow = () => {
+    const foundShow = dummyShowsData?.find((s) => s._id === id);
+    if (foundShow) {
+      setShow({ ...foundShow, dateTime: dummyDateTimeData });
     }
+  };
+
+  const getOccupiedSeats = () => {
+    // Find occupied seats from dummy dashboard data by matching date and show time
+    const occupied = [];
+    dummyDashboardData.activeShows.forEach((show) => {
+      // Check if this show matches the selected date and time
+      if (selectedTime && show.showDateTime === selectedTime.time) {
+        Object.keys(show.occupiedSeats || {}).forEach((seat) => {
+          occupied.push(seat);
+        });
+      }
+    });
+    setOccupiedSeats(occupied);
   };
 
   const handleSeatClick = (seatId) => {
@@ -49,7 +60,7 @@ export default function SeatLayoutPage() {
     }
 
     if (occupiedSeats.includes(seatId)) {
-      return toast.error("This seat is already book");
+      return toast.error("This seat is already booked");
     }
     setSelectedSeats((prev) =>
       prev.includes(seatId)
@@ -79,20 +90,6 @@ export default function SeatLayoutPage() {
     </div>
   );
 
-  const getOccupiedSeats = async () => {
-    try {
-      const { data } = await axios.get(
-        `/api/booking/seats/${selectedTime.showId}`
-      );
-      if (data.success) {
-        setOccupiedSeats(data.occupiedSeats);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const bookTickets = async () => {
     try {
