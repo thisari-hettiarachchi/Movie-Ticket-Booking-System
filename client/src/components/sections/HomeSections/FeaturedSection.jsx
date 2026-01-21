@@ -5,10 +5,14 @@ import BlurCircle from "../../shared/BlurCircle";
 import { useRouter } from "next/navigation";
 import MovieCard from "@/components/MovieCard";
 import { useAppContext } from "@/context/AppContext";
+import { dummyShowsData } from "@/data";
 
 const FeaturedSection = () => {
   const router = useRouter();
   const { shows } = useAppContext();
+
+  // Use dummy data if shows is empty
+  const displayShows = shows && shows.length > 0 ? shows : dummyShowsData;
 
   return (
     <div className="px-6 md:px-16 lg:px-24 xl:px-44 overflow-hidden">
@@ -24,9 +28,9 @@ const FeaturedSection = () => {
         </button>
       </div>
 
-      {shows.length > 0 ? (
+      {displayShows.length > 0 ? (
         <div className="flex flex-wrap justify-center max-sm:justify-center gap-8 mt-8">
-          {shows.slice(0, 4).map((show) => (
+          {displayShows.slice(0, 4).map((show) => (
             <MovieCard key={show._id} movie={show} />
           ))}
         </div>
@@ -36,7 +40,7 @@ const FeaturedSection = () => {
         </p>
       )}
 
-      {shows.length > 0 && (
+      {displayShows.length > 0 && (
         <div className="flex justify-center mt-20">
           <button
             onClick={() => {

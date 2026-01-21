@@ -3,9 +3,10 @@
 import BlurCircle from "@/components/shared/BlurCircle";
 import { PlayCircleIcon } from "lucide-react";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import dynamic from "next/dynamic";
 import { useAppContext } from "@/context/AppContext";
+import { dummyTrailers } from "@/data";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -22,49 +23,59 @@ const TrailersSection = () => {
 
   const { heroMovies, image_base_url, axios } = useAppContext();
 
+  // useEffect(() => {
+  //   if (!heroMovies || heroMovies.length === 0) return;
+
+  //   const fetchTrailers = async () => {
+  //     try {
+  //       const fetched = await Promise.all(
+  //         heroMovies.map(async (movie) => {
+  //           try {
+  //             const { data } = await axios.get(`/api/show/${movie.id}`);
+  //             if (data.success && data.movie?.trailerUrl) {
+  //               return {
+  //                 id: movie.id,
+  //                 title: data.movie.title || movie.title,
+  //                 image: `${image_base_url}${
+  //                   data.movie.backdrop_path || movie.backdrop_path
+  //                 }`,
+  //                 videoUrl: data.movie.trailerUrl,
+  //                 posterImage: `${image_base_url}${
+  //                   data.movie.poster_path || movie.poster_path
+  //                 }`,
+  //               };
+  //             }
+  //             return null;
+  //           } catch (err) {
+  //             console.log(`Error fetching trailer for ${movie.title}`, err);
+  //             return null;
+  //           }
+  //         })
+  //       );
+
+  //       const validTrailers = fetched.filter((t) => t !== null);
+  //       setTrailers(validTrailers);
+  //       setCurrentTrailer(validTrailers[0] || null);
+  //     } catch (err) {
+  //       console.log("Error fetching trailers", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchTrailers();
+  // }, [heroMovies, axios, image_base_url]);
+
+
+
+
   useEffect(() => {
-    if (!heroMovies || heroMovies.length === 0) return;
+    setTrailers(dummyTrailers);
+    setCurrentTrailer(dummyTrailers[0] || null);
+    setLoading(false);
+  }, []);
 
-    const fetchTrailers = async () => {
-      try {
-        const fetched = await Promise.all(
-          heroMovies.map(async (movie) => {
-            try {
-              const { data } = await axios.get(`/api/show/${movie.id}`);
-              if (data.success && data.movie?.trailerUrl) {
-                return {
-                  id: movie.id,
-                  title: data.movie.title || movie.title,
-                  image: `${image_base_url}${
-                    data.movie.backdrop_path || movie.backdrop_path
-                  }`,
-                  videoUrl: data.movie.trailerUrl,
-                  posterImage: `${image_base_url}${
-                    data.movie.poster_path || movie.poster_path
-                  }`,
-                };
-              }
-              return null;
-            } catch (err) {
-              console.log(`Error fetching trailer for ${movie.title}`, err);
-              return null;
-            }
-          })
-        );
-
-        const validTrailers = fetched.filter((t) => t !== null);
-        setTrailers(validTrailers);
-        setCurrentTrailer(validTrailers[0] || null);
-      } catch (err) {
-        console.log("Error fetching trailers", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTrailers();
-  }, [heroMovies, axios, image_base_url]);
-
+  
   // Determine 4 preview slots
   const previewSlots = [0, 1, 2, 3].map((i) => trailers[i] || null);
 

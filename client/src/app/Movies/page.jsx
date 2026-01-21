@@ -3,9 +3,11 @@ import React from "react";
 import MovieCard from "@/components/MovieCard";
 import BlurCircle from "@/components/shared/BlurCircle";
 import { useAppContext } from "@/context/AppContext";
+import { dummyShowsData } from "@/data";
 
 const Movies = () => {
-  const { shows } = useAppContext();
+  // const { shows } = useAppContext();
+  const shows = dummyShowsData; // Using dummy data for now
 
   return shows.length > 0 ? (
     <div className="relative my-40 mb-60 px-6 md:px-16 lg:px-40 xl:px-44 overflow-hiddenmin-h-[80vh]">

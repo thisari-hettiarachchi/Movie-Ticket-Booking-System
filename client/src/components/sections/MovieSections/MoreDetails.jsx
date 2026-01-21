@@ -1,5 +1,5 @@
 "use client";
-import { dummyTrailers } from "@/data/index";
+import { dummyShowsData, dummyTrailers } from "@/data/index";
 import { useParams } from "next/navigation";
 import BlurCircle from "@/components/shared/BlurCircle";
 import { Heart, PlayCircleIcon, StarIcon, X } from "lucide-react";
@@ -19,61 +19,101 @@ const MoreDetails = () => {
   const [movie, setMovie] = useState(null);
   const [trailer, setTrailer] = useState(null);
   const [show, setShow] = useState(null);
-  const {
-    shows,
-    axios,
-    getToken,
-    user,
-    fetchFavoriteMovies,
-    favoriteMovies,
-    image_base_url,
-  } = useAppContext();
+  const { image_base_url, favoriteMovies } = useAppContext();
+  // const {
+  //   shows,
+  //   axios,
+  //   getToken,
+  //   user,
+  //   fetchFavoriteMovies,
+  //   favoriteMovies,
+  //   image_base_url,
+  // } = useAppContext();
 
-  const getShow = async () => {
-    try {
-      const { data } = await axios.get(`/api/show/${id}`);
-      if (data.success) {
-        setShow(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  // const getShow = async () => {
+  //   try {
+  //     const { data } = await axios.get(`/api/show/${id}`);
+  //     if (data.success) {
+  //       setShow(data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  // const handleFavourite = async (movieId) => {
+  //   try {
+  //     if (!user) return TransformStream.error("please login to proceed");
+  //     const { data } = await axios.post(
+  //       "/api/user/update-favorite",
+  //       { movieId: id },
+  //       { headers: { Authorization: `Bearer ${await getToken()}` } }
+  //     );
+
+  //     if (data.success) {
+  //       await fetchFavoriteMovies();
+  //       toast.success(data.message);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getShow();
+  // }, [id]);
+
+  // useEffect(() => {
+  //   const foundMovie = shows?.find((show) => show._id === id);
+  //   setMovie(foundMovie);
+  // }, [id]);
+
+  // useEffect(() => {
+  //   if (show?.movie?.trailerUrl) {
+  //     setTrailer(show.movie.trailerUrl);
+  //   }
+  // }, [show]);
+
+  // console.log("trailer url", trailer)
+
+  const shows = dummyShowsData;
+  const trailers = dummyTrailers;
+
+  const resolveImageSrc = (src) => {
+    if (!src) return "";
+    return src.startsWith("http")
+      ? src
+      : image_base_url
+        ? image_base_url + src
+        : src;
   };
 
-  const handleFavourite = async (movieId) => {
-    try {
-      if (!user) return TransformStream.error("please login to proceed");
-      const { data } = await axios.post(
-        "/api/user/update-favorite",
-        { movieId: id },
-        { headers: { Authorization: `Bearer ${await getToken()}` } }
-      );
-
-      if (data.success) {
-        await fetchFavoriteMovies();
-        toast.success(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const getShow = () => {
+    const found = shows?.find((s) => s._id === id);
+    setShow(found || null);
   };
 
+  const handleFavourite = (movieId) => {
+    const isFavorite = favoriteMovies.find((movie) => movie._id === movieId);
+    if (isFavorite) {
+      toast.error("Movie already in favorites");
+    } else {
+      toast.success("Movie added to favorites");
+    }
+  };
   useEffect(() => {
     getShow();
   }, [id]);
 
   useEffect(() => {
-    const foundMovie = shows?.find((show) => show._id === id);
-    setMovie(foundMovie);
+    const foundMovie = shows?.find((s) => s._id === id);
+    setMovie(foundMovie || null);
   }, [id]);
 
   useEffect(() => {
-    if (show?.movie?.trailerUrl) {
-      setTrailer(show.movie.trailerUrl);
-    }
-  }, [show]);
-
-  console.log("trailer url", trailer)
+    const foundTrailer = trailers?.find((t) => String(t.id) === String(id));
+    if (foundTrailer) setTrailer(foundTrailer.videoUrl);
+  }, [id]);
 
   if (!movie) {
     return <Loading />;
@@ -84,7 +124,7 @@ const MoreDetails = () => {
         <div className="px-6 md:px-16 lg:px-40 pt-8 md:pt-10">
           <div className="absolute inset-0 -z-10">
             <Image
-              src={image_base_url + movie.backdrop_path}
+              src={resolveImageSrc(movie.backdrop_path)}
               alt={movie.title}
               fill
               className="object-cover rounded-2xl opacity-30"
@@ -93,9 +133,9 @@ const MoreDetails = () => {
           </div>
 
           <div className="flex flex-col md:flex-row gap-15 maxw-6xl mx-auto">
-            {show && show.movie ? (
+            {show ? (
               <Image
-                src={image_base_url + show.movie.poster_path}
+                src={resolveImageSrc(show.poster_path)}
                 alt={"Show Image"}
                 width={250}
                 height={112}
